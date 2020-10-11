@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../provider/products_provider.dart';
 
 class ProductDetailScreen extends StatelessWidget {
@@ -12,10 +13,13 @@ class ProductDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final productId =
         ModalRoute.of(context).settings.arguments as String; // is the id!
+    final loadedProduct = Provider.of<Products>(context, listen: false) 
+        .findById(
+            productId); // listen: false wordt de product eenmalig opgehaald. Rebuild niet wanneer er iets verandert in de lijst.
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('title'),
+        title: Text(loadedProduct.title),
       ),
     );
   }
