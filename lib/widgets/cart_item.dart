@@ -15,6 +15,7 @@ class CartItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
+      // swipe actions
       key: ValueKey(id),
       background: Container(
         color: Theme.of(context).errorColor,
@@ -29,6 +30,7 @@ class CartItem extends StatelessWidget {
       ),
       direction: DismissDirection.endToStart,
       onDismissed: (direction) {
+        // swipe action gevolg
         Provider.of<Cart>(context, listen: false).removeItem(productId);
       },
       child: Card(
