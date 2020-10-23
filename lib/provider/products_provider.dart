@@ -63,4 +63,15 @@ class Products with ChangeNotifier {
     // _items.insert(0, newProduct); insert op een specifieke index
     notifyListeners();
   }
+
+  void updateProduct(String id, Product newProduct) {
+    final prodIndex = _items.indexWhere((prod) => prod.id == id);
+    if (prodIndex >= 0) {
+      _items[prodIndex] =
+          newProduct; // save de nieuwe product op de index van de originele product
+      notifyListeners();
+    } else {
+      print('...');
+    }
+  }
 }
