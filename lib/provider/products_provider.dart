@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
+import '../models/http_exception.dart';
 import 'product.dart';
 
 class Products with ChangeNotifier {
-  final url =
-      'https://flutter-course-shop-app-b1ea2.firebaseio.com/products.json';
-
   List<Product> _items = [
     // Product(
     //   id: 'p1',
@@ -58,6 +57,8 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
+    final url =
+        'https://flutter-course-shop-app-b1ea2.firebaseio.com/products.json';
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -79,6 +80,8 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
+    final url =
+        'https://flutter-course-shop-app-b1ea2.firebaseio.com/products.json';
     try {
       final response = await http.post(
         url,
@@ -106,9 +109,18 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
+      final url =
+          'https://flutter-course-shop-app-b1ea2.firebaseio.com/products/$id.json';
+      await http.patch(url,
+          body: json.encode({
+            'title': newProduct.title,
+            'description': newProduct.description,
+            'price': newProduct.price,
+            'imageUrl': newProduct.imageUrl,
+          }));
       _items[prodIndex] =
           newProduct; // save de nieuwe product op de index van de originele product
       notifyListeners();
@@ -117,8 +129,27 @@ class Products with ChangeNotifier {
     }
   }
 
-  void deleteProduct(String id) {
-    _items.removeWhere((prod) => prod.id == id);
+  Future<void> deleteProduct(String id) async {
+    final url =
+        'https://flutter-course-shop-app-b1ea2.firebaseio.com/products/$id.json';
+
+    final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
+    var existingProduct =
+        _items[existingProductIndex]; // maak een backup in memory
+
+    _items.removeAt(existingProductIndex);
     notifyListeners();
+
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      items.insert(existingProductIndex,
+          existingProduct); // reinsert wanneer de delete faalt.
+      notifyListeners();
+
+      throw HttpException('Could not delete product.');
+    }
+
+    existingProduct = null;
   }
 }
