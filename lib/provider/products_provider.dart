@@ -54,10 +54,9 @@ class Products with ChangeNotifier {
     return _items.firstWhere((product) => product.id == id);
   }
 
-  Future<void> addProduct(Product product) {
-    final url =
-        'https://flutter-course-shop-app-b1ea2.firebaseio.com/products.json';
-    return http
+  Future<void> addProduct(Product product) async {
+    const url = 'https://flutter-update.firebaseio.com/products.json';
+    http
         .post(
       url,
       body: json.encode(
@@ -66,20 +65,24 @@ class Products with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite
+          'isFavorite': product.isFavorite,
         },
       ),
     )
         .then((response) {
       final newProduct = Product(
-          title: product.title,
-          description: product.description,
-          id: json.decode(response.body)['name'],
-          imageUrl: product.imageUrl,
-          price: product.price);
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        id: json.decode(response.body)['name'],
+      );
       _items.add(newProduct);
-      // _items.insert(0, newProduct); insert op een specifieke index
+      // _items.insert(0, newProduct); // at the start of the list
       notifyListeners();
+    }).catchError((error) {
+      print(error);
+      throw error;
     });
   }
 
