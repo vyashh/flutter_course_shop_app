@@ -23,8 +23,14 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(
           value: Auth(),
         ),
-        ChangeNotifierProvider.value(
-          value: Products(),
+        ChangeNotifierProxyProvider<Auth, Products>(
+          // <Auth> zorgt ervoor dat de provider afhangt van de Auth Provider.
+          update: (ctx, auth, previousProducts) => Products(
+              auth.token,
+              previousProducts == null
+                  ? []
+                  : previousProducts
+                      .items), // haalt items uit de oude state. Zo verlies je geen items in je scherm
         ),
         ChangeNotifierProvider.value(
           value: Cart(),
@@ -33,7 +39,8 @@ class MyApp extends StatelessWidget {
           value: Orders(),
         ),
       ],
-      child: MaterialApp(
+      child: Consumer<Auth>(
+        builder: (context, auth, _) => MaterialApp(
           title: 'MyShop',
           theme: ThemeData(
             primarySwatch: Colors.amber,
@@ -41,14 +48,16 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Lato',
             errorColor: Colors.red,
           ),
-          home: AuthScreen(),
+          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
           routes: {
             ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
             CartScreen.routeName: (ctx) => CartScreen(),
             OrdersScreen.routeName: (ctx) => OrdersScreen(),
             UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
             EditProductScreen.routeName: (ctx) => EditProductScreen()
-          }),
+          },
+        ),
+      ),
     );
   }
 }

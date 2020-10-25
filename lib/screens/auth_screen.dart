@@ -122,7 +122,6 @@ class _AuthCardState extends State<AuthCard> {
   }
 
   Future<void> _submit() async {
-    print('_submit() called');
     if (!_formKey.currentState.validate()) {
       // Invalid!
       return;
@@ -135,11 +134,9 @@ class _AuthCardState extends State<AuthCard> {
       if (_authMode == AuthMode.Login) {
         await Provider.of<Auth>(context, listen: false)
             .login(_authData['email'], _authData['password']);
-        print('AuthMode.Login called');
       } else {
         await Provider.of<Auth>(context, listen: false)
             .signup(_authData['email'], _authData['password']);
-        print('AuthMode.signup called');
       }
     } on HttpException catch (error) {
       print('HttpException error: $error');
