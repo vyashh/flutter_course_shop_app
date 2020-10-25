@@ -106,15 +106,15 @@ class _AuthCardState extends State<AuthCard> {
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: Text('An Error Occurred!'),
         content: Text(message),
         actions: <Widget>[
           FlatButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
             child: Text('Okay'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
           )
         ],
       ),
@@ -155,6 +155,7 @@ class _AuthCardState extends State<AuthCard> {
       } else if (error.toString().contains('INVALID_PASSWORD')) {
         errorMessage = 'Invalid password.';
       }
+      print(errorMessage);
       _showErrorDialog(errorMessage);
     } catch (error) {
       print('Catch error: $error');
