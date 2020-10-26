@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import './cart.dart';
 
+import './auth.dart';
+
 class OrderItem {
   final String id;
   final double amount;
@@ -19,6 +21,9 @@ class OrderItem {
 
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
+  final String authToken;
+
+  Orders(this.authToken, this._orders);
 
   List<OrderItem> get orders {
     return [..._orders];
@@ -26,7 +31,7 @@ class Orders with ChangeNotifier {
 
   Future<void> fetchAndSetOrders() async {
     const url =
-        'https://flutter-course-shop-app-b1ea2.firebaseio.com/orders.json';
+        'https://flutter-course-shop-app-b1ea2.firebaseio.com/orders.json?auth=$token';
     final response = await http.get(url).catchError((error) {
       print(error);
     });
