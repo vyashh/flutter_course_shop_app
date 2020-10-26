@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
           // <Auth> zorgt ervoor dat de provider afhangt van de Auth Provider.
           update: (ctx, auth, previousProducts) => Products(
               auth.token,
+              auth.userId,
               previousProducts == null
                   ? []
                   : previousProducts

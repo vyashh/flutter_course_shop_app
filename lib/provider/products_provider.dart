@@ -42,8 +42,9 @@ class Products with ChangeNotifier {
   ];
 
   final String authToken;
+  final String userId;
 
-  Products(this.authToken, this._items);
+  Products(this.authToken, this.userId, this._items);
 
   List<Product> get items {
     print('called items');
@@ -61,7 +62,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    final url =
+    var url =
         'https://flutter-course-shop-app-b1ea2.firebaseio.com/products.json?auth=$authToken';
     try {
       final response = await http.get(url);
@@ -71,15 +72,26 @@ class Products with ChangeNotifier {
         return;
       }
 
+      url =
+          'https://flutter-course-shop-app-b1ea2.firebaseio.com/products/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
+
       final List<Product> loadedProducts = [];
       extractedData.forEach((productId, productData) {
-        loadedProducts.add(Product(
+        loadedProducts.add(
+          Product(
             id: productId,
             title: productData['title'],
             description: productData['description'],
             imageUrl: productData['imageUrl'],
+            isFavorite: favoriteData == null
+                ? false
+                : favoriteData[productId] ??
+                    false, // als de fetched entry niet bestaat valt ie als laatste terug naar ?? false
             price: productData['price'],
-            isFavorite: productData['isFavorite']));
+          ),
+        );
       });
       _items = loadedProducts;
       notifyListeners();
