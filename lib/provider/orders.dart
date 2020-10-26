@@ -22,16 +22,18 @@ class OrderItem {
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
   final String authToken;
+  final String userId;
 
-  Orders(this.authToken, this._orders);
+  Orders(this.authToken, this.userId, this._orders);
 
   List<OrderItem> get orders {
     return [..._orders];
   }
 
   Future<void> fetchAndSetOrders() async {
+    print('called fetchAndSetOrders()');
     final url =
-        'https://flutter-update.firebaseio.com/orders.json?auth=$authToken';
+        'https://flutter-update.firebaseio.com/orders/$userId.json?auth=$authToken';
     final response = await http.get(url);
     final List<OrderItem> loadedOrders = [];
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -58,12 +60,13 @@ class Orders with ChangeNotifier {
       );
     });
     _orders = loadedOrders.reversed.toList();
+    print(_orders);
     notifyListeners();
   }
 
   Future<void> addOrder(List<CartItem> cartProduct, double total) async {
-    const url =
-        'https://flutter-course-shop-app-b1ea2.firebaseio.com/orders.json';
+    final url =
+        'https://flutter-course-shop-app-b1ea2.firebaseio.com/orders/$userId.json?auth=$authToken';
     final timestamp = DateTime.now();
     final response = await http.post(url,
         body: json.encode({
