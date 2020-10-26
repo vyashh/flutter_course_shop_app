@@ -102,13 +102,16 @@ class Auth with ChangeNotifier {
     return true;
   }
 
-  void logout() {
+  Future<void> logout() async {
     _token = _userId = _expiryDate = null;
     if (_authTimer != null) {
       _authTimer.cancel();
       _authTimer = null;
     }
     notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    // prefs.remove('userData'); // wanneer je meerdere dingen opslaat in preferences.
+    prefs.clear(); // is voor alles in preferences
   }
 
   void _autoLogout() {
